@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  # api:
+  #   build: .
+  #   restart: 'always'
+  #   env_file: ./.env
+  #   volumes:
+  #     - './uploads:/app/uploads'
+  #     - './pinned-items:/app/pinned-items'
+  #     - './img:/app/dist/img'
+  #     - './parser:/app/dist/parser'
+  #   depends_on:
+  #     - db
+  #   ports:
+  #     - '3001:3000'
+  db:
+    image: postgres:14.1-alpine
+    restart: always
+    env_file: ./.env
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8082:8080

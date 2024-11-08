@@ -1,0 +1,96 @@
+{
+  "info": {
+    "name": "SiteAuthorization",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get All",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{url}}/site-authorization/all",
+          "host": ["{{url}}"],
+          "path": ["site-authorization", "all"]
+        }
+      }
+    },
+    {
+      "name": "Create",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Example\"\n}"
+        },
+        "url": {
+          "raw": "{{url}}/site-authorization/create",
+          "host": ["{{url}}"],
+          "path": ["site-authorization", "create"]
+        }
+      }
+    },
+    {
+      "name": "Update",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Updated Example\"\n}"
+        },
+        "url": {
+          "raw": "{{url}}/site-authorization/update/:id",
+          "host": ["{{url}}"],
+          "path": ["site-authorization", "update", ":id"]
+        }
+      }
+    },
+    {
+      "name": "Delete",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{url}}/site-authorization/delete/:id",
+          "host": ["{{url}}"],
+          "path": ["site-authorization", "delete", ":id"]
+        }
+      }
+    }
+  ]
+}

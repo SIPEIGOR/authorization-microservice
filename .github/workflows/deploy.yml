@@ -1,0 +1,52 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check secrets
+        run: echo "${{secrets.CHAT_ID}}"
+
+      - name: Send start message to Telegram
+        run: |
+          curl -s -X POST https://api.telegram.org/bot7157079871:AAHtQMB8hjV2CdfxqvisYezUVY2W7gPf-Bo/sendMessage -d chat_id="${{ secrets.CHAT_ID}}" -d message_thread_id="${{ secrets.THREAD }}" -d text="Deploy is starting (https://github.com/${{ secrets.GIT_REPOSITORY }}/actions/)"
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install sshpass and ssh
+        run: sudo apt-get update && sudo apt-get install -y sshpass openssh-client
+
+      - name: Check SSH connection
+        run: sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} echo "SSH connection smuccessful"
+
+      - name: Setup git authentication
+        run: git config --global url."https://${{ secrets.GIT_TOKEN }}@github.com/".insteadOf "https://github.com/"
+
+      - name: Deploy to server
+        run: |
+          sshpass -e ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} '
+            cd ${{ secrets.PROJECT_PATH }} && 
+            git remote set-url origin https://${{ secrets.GIT_TOKEN }}@github.com/${{ secrets.GIT_REPOSITORY }}.git &&
+            git pull &&
+            docker-compose build &&
+            docker-compose up -d &&
+            docker system prune' | tee -a deploy.log
+        env:
+          SSHPASS: ${{ secrets.SSH_PASSWORD }}
+
+      - name: Send success message to Telegram
+        if: success()
+        run: |
+          curl -s -X POST https://api.telegram.org/bot7157079871:AAHtQMB8hjV2CdfxqvisYezUVY2W7gPf-Bo/sendMessage -d chat_id="${{ secrets.CHAT_ID}}" -d message_thread_id="${{ secrets.THREAD }}" -d text="✅ Deploy completed successfully (https://github.com/${{ secrets.GIT_REPOSITORY }}/actions/)"        
+
+      - name: Send failure message to Telegram
+        if: failure()
+        run: |
+          curl -s -X POST https://api.telegram.org/bot7157079871:AAHtQMB8hjV2CdfxqvisYezUVY2W7gPf-Bo/sendMessage -d chat_id="${{ secrets.CHAT_ID}}" -d message_thread_id="${{ secrets.THREAD }}" -d text="🚫 Deploy failed (https://github.com/${{ secrets.GIT_REPOSITORY }}/actions/)"        

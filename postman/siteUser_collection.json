@@ -1,0 +1,96 @@
+{
+  "info": {
+    "name": "SiteUser",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get All",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{url}}/siteuser/all",
+          "host": ["{{url}}"],
+          "path": ["siteuser", "all"]
+        }
+      }
+    },
+    {
+      "name": "Create",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Example\"\n}"
+        },
+        "url": {
+          "raw": "{{url}}/siteuser/create",
+          "host": ["{{url}}"],
+          "path": ["siteuser", "create"]
+        }
+      }
+    },
+    {
+      "name": "Update",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Updated Example\"\n}"
+        },
+        "url": {
+          "raw": "{{url}}/siteuser/update/:id",
+          "host": ["{{url}}"],
+          "path": ["siteuser", "update", ":id"]
+        }
+      }
+    },
+    {
+      "name": "Delete",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{url}}/siteuser/delete/:id",
+          "host": ["{{url}}"],
+          "path": ["siteuser", "delete", ":id"]
+        }
+      }
+    }
+  ]
+}

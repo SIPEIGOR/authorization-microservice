@@ -1,0 +1,96 @@
+{
+  "info": {
+    "name": "__Name__",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get All",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{url}}/__name__/all",
+          "host": ["{{url}}"],
+          "path": ["__name__", "all"]
+        }
+      }
+    },
+    {
+      "name": "Create",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Example\"\n}"
+        },
+        "url": {
+          "raw": "{{url}}/__name__/create",
+          "host": ["{{url}}"],
+          "path": ["__name__", "create"]
+        }
+      }
+    },
+    {
+      "name": "Update",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Updated Example\"\n}"
+        },
+        "url": {
+          "raw": "{{url}}/__name__/update/:id",
+          "host": ["{{url}}"],
+          "path": ["__name__", "update", ":id"]
+        }
+      }
+    },
+    {
+      "name": "Delete",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{url}}/__name__/delete/:id",
+          "host": ["{{url}}"],
+          "path": ["__name__", "delete", ":id"]
+        }
+      }
+    }
+  ]
+}
