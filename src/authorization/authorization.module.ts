@@ -4,18 +4,19 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthorizationController } from './controllers/authorization.controller';
 import { AuthorizationEntity } from './entities/authorization.entity';
 import { AuthorizationService } from './services/authorization.service';
+import { JwtStrategy } from './strategy/jwt.strategy';
 import { LocalStrategy } from './strategy/local.strategy';
 
 @Module({
   imports: [
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'your_jwt_secret_key',
+      secret: process.env.JWT_SECRET || 'secret_key',
       signOptions: { expiresIn: '1h' },
     }),
     TypeOrmModule.forFeature([AuthorizationEntity]),
   ],
   controllers: [AuthorizationController],
-  providers: [AuthorizationService, LocalStrategy],
-  exports: [AuthorizationService, LocalStrategy],
+  providers: [AuthorizationService, LocalStrategy, JwtStrategy],
+  exports: [AuthorizationService, LocalStrategy, JwtStrategy],
 })
 export class AuthorizationModule {}
