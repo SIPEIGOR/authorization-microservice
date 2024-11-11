@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 
 export async function generateTokens(
-  payload: { email: string; id: string },
+  payload: { email: string; id: string; tokenVersion: number },
   expiresAccess?: string,
   expiresRefresh?: string,
 ) {

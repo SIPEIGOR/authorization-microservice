@@ -17,11 +17,14 @@ export class AuthorizationEntity extends BaseEntity {
   @Column({ unique: true })
   email: string;
 
+  @Column()
+  password: string;
+
   @Column({ default: false })
   isVerified: boolean;
 
-  @Column()
-  password: string;
+  @Column({ default: 0 })
+  tokenVersion: number;
 
   @Column({ nullable: true })
   refreshToken: string;

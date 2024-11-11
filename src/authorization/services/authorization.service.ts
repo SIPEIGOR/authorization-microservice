@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
@@ -53,7 +58,13 @@ export class AuthorizationService {
       throw new BadRequestException('Користувач з таким email не знайдений');
     }
 
-    const payload = { email: user.email, id: user.id };
+    user.tokenVersion += 1;
+
+    const payload = {
+      email: user.email,
+      id: user.id,
+      tokenVersion: user.tokenVersion,
+    };
     const tokens = await generateTokens(payload);
 
     await this.authorizationRepository.save({
@@ -79,5 +90,64 @@ export class AuthorizationService {
 
   async findUserById(id: string) {
     return this.authorizationRepository.findOne({ where: { id } });
+  }
+
+  async refresh(refreshToken: string) {
+    if (!refreshToken) {
+      throw new UnauthorizedException('Refresh token is missing');
+    }
+
+    let payload;
+    try {
+      payload = this.jwtService.verify(refreshToken, {
+        secret: process.env.JWT_SECRET,
+      });
+    } catch (error) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    const user = await this.authorizationRepository.findOne({
+      where: { id: payload.id },
+    });
+
+    if (!user || user.refreshToken !== refreshToken) {
+      console.error('Stored token does not match or user not found');
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    const newTokens = await generateTokens({
+      email: user.email,
+      id: user.id,
+      tokenVersion: user.tokenVersion,
+    });
+
+    user.refreshToken = newTokens.refreshToken;
+    await this.authorizationRepository.save(user);
+
+    return newTokens;
+  }
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest();
+    const authHeader = request.headers.authorization;
+    if (!authHeader) {
+      throw new UnauthorizedException('Authorization header missing');
+    }
+
+    const token = authHeader.split(' ')[1];
+    try {
+      const payload = this.jwtService.verify(token);
+      const user = await this.authorizationRepository.findOne({
+        where: { id: payload.id },
+      });
+      if (!user || user.tokenVersion !== payload.tokenVersion) {
+        throw new UnauthorizedException('Invalid token');
+      }
+
+      request.user = payload;
+      return true;
+    } catch (error) {
+      throw new UnauthorizedException('Invalid token');
+    }
   }
 }
