@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import AdminJS from 'adminjs';
 import { options } from './adminjs/config/adminjs-options';
+import { AuthorizationModule } from './authorization/authorization.module';
 import { DatabaseModule } from './database/database.module';
 
 AdminJS.registerAdapter({ Database, Resource });
@@ -47,6 +48,7 @@ AdminJS.registerAdapter({ Database, Resource });
     }),
     HttpModule,
     DatabaseModule,
+    AuthorizationModule,
   ],
   controllers: [],
   providers: [],

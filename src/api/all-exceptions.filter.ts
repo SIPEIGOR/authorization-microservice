@@ -20,10 +20,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
     if (exception instanceof HttpException) {
       status = exception.getStatus();
       const responseMessage = exception.getResponse();
+
       message =
         typeof responseMessage === 'string'
           ? responseMessage
-          : JSON.stringify(responseMessage);
+          : (responseMessage as any).message || 'An error occurred';
     } else if (exception instanceof QueryFailedError) {
       status = HttpStatus.BAD_REQUEST;
       message = 'Database query error';
@@ -43,7 +44,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
       statusCode: status,
       message,
       timestamp: new Date().toISOString(),
-      path: ctx.getRequest().url,
     });
   }
 }
