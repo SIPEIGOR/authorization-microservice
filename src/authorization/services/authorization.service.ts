@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { LoginDto, RegisterDto } from '../dto/authorization.dto';
 import { AuthorizationEntity } from '../entities/authorization.entity';
 import { generateTokens } from '../utils/generate-tokens';
+import { normalizeEmail } from '../utils/normalize-email';
 
 @Injectable()
 export class AuthorizationService {
@@ -15,13 +16,20 @@ export class AuthorizationService {
     private readonly jwtService: JwtService,
   ) {}
 
+  private async isPasswordValid(
+    password: string,
+    hash: string,
+  ): Promise<boolean> {
+    return bcrypt.compare(password, hash);
+  }
+
   async registration(dto: RegisterDto) {
-    const email = dto.email.toLowerCase().trim();
-    const candidate = await this.authorizationRepository.findOne({
+    const email = normalizeEmail(dto.email);
+    const existingUser = await this.authorizationRepository.findOne({
       where: { email },
     });
 
-    if (candidate) {
+    if (existingUser) {
       throw new BadRequestException(
         'Користувач з таким email вже зареєстрований',
       );
@@ -32,11 +40,11 @@ export class AuthorizationService {
       email,
     });
 
-    return await this.authorizationRepository.save(newUser);
+    return this.authorizationRepository.save(newUser);
   }
 
   async login(dto: LoginDto) {
-    const email = dto.email.toLowerCase().trim();
+    const email = normalizeEmail(dto.email);
     const user = await this.authorizationRepository.findOne({
       where: { email },
     });
@@ -48,9 +56,11 @@ export class AuthorizationService {
     const payload = { email: user.email, id: user.id };
     const tokens = await generateTokens(payload);
 
-    user.isVerified = true;
-    user.refreshToken = tokens.refreshToken;
-    await this.authorizationRepository.save(user);
+    await this.authorizationRepository.save({
+      ...user,
+      isVerified: true,
+      refreshToken: tokens.refreshToken,
+    });
 
     return tokens;
   }
@@ -60,16 +70,14 @@ export class AuthorizationService {
       where: { email },
     });
 
-    if (user && bcrypt.compareSync(password, user.password)) {
-      const { ...result } = user;
+    if (user && (await this.isPasswordValid(password, user.password))) {
+      const { password, refreshToken, ...result } = user;
       return result;
     }
     return null;
   }
 
   async findUserById(id: string) {
-    return await this.authorizationRepository.findOne({
-      where: { id },
-    });
+    return this.authorizationRepository.findOne({ where: { id } });
   }
 }
